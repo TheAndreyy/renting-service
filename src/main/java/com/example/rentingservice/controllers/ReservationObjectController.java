@@ -2,10 +2,13 @@ package com.example.rentingservice.controllers;
 
 import com.example.rentingservice.config.ApplicationConstants;
 import com.example.rentingservice.models.CreateReservationRequest;
+import com.example.rentingservice.models.ReservationResponse;
 import com.example.rentingservice.services.ReservationObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(ApplicationConstants.API_PREFIX + "/object")
@@ -13,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class ReservationObjectController {
 
     private final ReservationObjectService service;
+
+    @GetMapping("{reservationObjectId}")
+    public ResponseEntity<List<ReservationResponse>> getReservations(@PathVariable Integer reservationObjectId) {
+        return ResponseEntity.ok(service.getReservations(reservationObjectId));
+    }
 
     @PostMapping("{reservationObjectId}/reserve")
     public ResponseEntity<Void> createReservation(
