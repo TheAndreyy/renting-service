@@ -2,7 +2,7 @@ package com.example.rentingservice.controllers;
 
 import com.example.rentingservice.config.ApplicationConstants;
 import com.example.rentingservice.models.CreateReservationRequest;
-import com.example.rentingservice.models.ReservationResponse;
+import com.example.rentingservice.models.reservationresponse.ReservationResponse;
 import com.example.rentingservice.services.ReservationObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

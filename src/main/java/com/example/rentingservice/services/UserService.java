@@ -1,8 +1,8 @@
 package com.example.rentingservice.services;
 
 import com.example.rentingservice.entities.User;
-import com.example.rentingservice.mappres.ReservationToReservationResponseMapper;
-import com.example.rentingservice.models.ReservationResponse;
+import com.example.rentingservice.mappres.reservationresponse.ReservationToReservationResponseMapper;
+import com.example.rentingservice.models.reservationresponse.ReservationResponse;
 import com.example.rentingservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %d not found", userId)));
         return user.getReservations().stream()
-                .map(reservationResponseMapper::mapWithObjectInfo)
+                .map(reservationResponseMapper::map)
                 .toList();
     }
 }

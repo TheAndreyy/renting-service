@@ -4,9 +4,9 @@ import com.example.rentingservice.entities.Reservation;
 import com.example.rentingservice.entities.ReservationObject;
 import com.example.rentingservice.entities.User;
 import com.example.rentingservice.mappres.CreateReservationRequestToReservationMapper;
-import com.example.rentingservice.mappres.ReservationToReservationResponseMapper;
+import com.example.rentingservice.mappres.reservationresponse.ReservationToReservationResponseMapper;
 import com.example.rentingservice.models.CreateReservationRequest;
-import com.example.rentingservice.models.ReservationResponse;
+import com.example.rentingservice.models.reservationresponse.ReservationResponse;
 import com.example.rentingservice.repositories.ReservationObjectRepository;
 import com.example.rentingservice.repositories.ReservationRepository;
 import com.example.rentingservice.repositories.UserRepository;
@@ -31,7 +31,7 @@ public class ReservationObjectService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Object with id: %d not found", reservationObjectId)));
 
         return object.getReservations().stream()
-                .map(reservationResponseMapper::mapWithUserInfo)
+                .map(reservationResponseMapper::map)
                 .toList();
     }
 
