@@ -20,10 +20,10 @@ public class Reservation {
     private Long reservationId;
 
     @Column(nullable = false)
-    private Instant from;
+    private Instant start;
 
     @Column(nullable = false)
-    private Instant to;
+    private Instant end;
 
     private BigDecimal cost;
 

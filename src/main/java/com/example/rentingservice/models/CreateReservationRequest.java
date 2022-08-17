@@ -11,8 +11,8 @@ import java.time.Instant;
 public class CreateReservationRequest {
 
     private Integer userId;
-    private Instant from;
-    private Instant to;
+    private Instant start;
+    private Instant end;
     private BigDecimal cost;
 
 }

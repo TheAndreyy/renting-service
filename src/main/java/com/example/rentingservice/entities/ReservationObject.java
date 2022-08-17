@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 public class ReservationObject {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Integer reservationObjectId;
 
@@ -24,11 +24,9 @@ public class ReservationObject {
     private String shortDescription;
     private String longDescription;
 
-    @Column(nullable = false)
     private BigDecimal unitPrice;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TimeUnit unit;
 
     @Setter(AccessLevel.NONE)
@@ -37,6 +35,6 @@ public class ReservationObject {
     private User owner;
 
     @OneToMany(mappedBy = "object", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reservation> reservations = new java.util.ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
 
 }

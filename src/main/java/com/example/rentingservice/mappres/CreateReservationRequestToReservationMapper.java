@@ -9,8 +9,8 @@ public class CreateReservationRequestToReservationMapper {
 
     public Reservation map(CreateReservationRequest request) {
         return Reservation.builder()
-                .from(request.getFrom())
-                .to(request.getTo())
+                .start(request.getStart())
+                .end(request.getEnd())
                 .cost(request.getCost())
                 .build();
     }
