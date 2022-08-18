@@ -17,7 +17,7 @@ public class ReservationObjectController {
 
     private final ReservationObjectService service;
 
-    @GetMapping("{reservationObjectId}")
+    @GetMapping("{reservationObjectId}/reservations")
     public ResponseEntity<List<ReservationResponse>> getReservations(@PathVariable Integer reservationObjectId) {
         return ResponseEntity.ok(service.getReservations(reservationObjectId));
     }

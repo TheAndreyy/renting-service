@@ -13,11 +13,12 @@ import java.time.Instant;
 @NoArgsConstructor
 @Entity
 public class Reservation {
+    // TODO: Add index
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Long reservationId;
+    private Integer reservationId;
 
     @Column(nullable = false)
     private Instant start;
