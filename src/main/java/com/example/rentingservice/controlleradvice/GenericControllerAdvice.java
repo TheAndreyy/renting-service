@@ -18,7 +18,7 @@ public class GenericControllerAdvice<T extends RuntimeException> {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeErrorException(T exception) {
         log.error("Internal server error!", exception);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.internalServerError()
                 .body(new ErrorResponse("UnexpectedError", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
     }
 
