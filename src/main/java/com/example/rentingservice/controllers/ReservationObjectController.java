@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class ReservationObjectController {
     @PostMapping("{reservationObjectId}/reserve")
     public ResponseEntity<ReservationResponse> createReservation(
             @PathVariable Integer reservationObjectId,
-            @RequestBody CreateReservationRequest reservationRequest
+            @RequestBody @Valid CreateReservationRequest reservationRequest
     ) {
         return ResponseEntity.ok(service.createReservation(reservationObjectId, reservationRequest));
     }

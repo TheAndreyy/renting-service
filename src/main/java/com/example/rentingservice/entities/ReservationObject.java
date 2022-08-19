@@ -34,6 +34,7 @@ public class ReservationObject {
     @JoinColumn(nullable = false, updatable = false)
     private User owner;
 
+    @Builder.Default
     @OneToMany(mappedBy = "object", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
