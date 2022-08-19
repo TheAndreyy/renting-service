@@ -7,10 +7,11 @@ import java.time.Instant;
 
 @Builder
 public record ReservationResponse(
-        UserResponse user,
-        ObjectResponse object,
+        Integer reservationId,
         Instant start,
         Instant end,
-        BigDecimal cost
+        BigDecimal cost,
+        ObjectResponse object,
+        UserResponse user
 ) {
 }

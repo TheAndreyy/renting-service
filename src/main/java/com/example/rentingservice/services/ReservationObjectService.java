@@ -37,7 +37,7 @@ public class ReservationObjectService {
     }
 
     @Transactional
-    public void createReservation(Integer reservationObjectId, CreateReservationRequest reservationRequest) {
+    public ReservationResponse createReservation(Integer reservationObjectId, CreateReservationRequest reservationRequest) {
         User user = userRepository.findById(reservationRequest.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %d not found", reservationRequest.getUserId())));
 
@@ -51,7 +51,8 @@ public class ReservationObjectService {
         Reservation reservation = createReservationMapper.map(reservationRequest);
         reservation.setLessee(user);
         reservation.setObject(object);
-        reservationRepository.save(reservation);
+        reservation = reservationRepository.save(reservation);
+        return reservationResponseMapper.map(reservation);
     }
 
 }

@@ -14,11 +14,12 @@ public class ReservationToReservationResponseMapper {
 
     public ReservationResponse map(Reservation reservation) {
         return ReservationResponse.builder()
-                .user(userMapper.map(reservation.getLessee()))
-                .object(objectMapper.map(reservation.getObject()))
+                .reservationId(reservation.getReservationId())
                 .start(reservation.getStart())
                 .end(reservation.getEnd())
                 .cost(reservation.getCost())
+                .object(objectMapper.map(reservation.getObject()))
+                .user(userMapper.map(reservation.getLessee()))
                 .build();
     }
 

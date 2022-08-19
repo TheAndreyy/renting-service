@@ -23,12 +23,11 @@ public class ReservationObjectController {
     }
 
     @PostMapping("{reservationObjectId}/reserve")
-    public ResponseEntity<Void> createReservation(
+    public ResponseEntity<ReservationResponse> createReservation(
             @PathVariable Integer reservationObjectId,
             @RequestBody CreateReservationRequest reservationRequest
     ) {
-        service.createReservation(reservationObjectId, reservationRequest);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(service.createReservation(reservationObjectId, reservationRequest));
     }
 
 }
