@@ -2,6 +2,7 @@ package com.example.rentingservice.controllers;
 
 import com.example.rentingservice.config.ApplicationConstants;
 import com.example.rentingservice.models.CreateReservationRequest;
+import com.example.rentingservice.models.UpdateReservationRequest;
 import com.example.rentingservice.models.reservationresponse.ReservationResponse;
 import com.example.rentingservice.services.ReservationObjectService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,14 @@ public class ReservationObjectController {
             @RequestBody CreateReservationRequest reservationRequest
     ) {
         return ResponseEntity.ok(service.createReservation(reservationObjectId, reservationRequest));
+    }
+
+    @PatchMapping("{reservationObjectId}/reservation/{reservationId}")
+    public ResponseEntity<ReservationResponse> updateReservation(
+            @PathVariable Integer reservationObjectId,
+            @PathVariable Integer reservationId,
+            @RequestBody UpdateReservationRequest reservationRequest) {
+        return ResponseEntity.ok(service.updateReservation(reservationObjectId, reservationId, reservationRequest));
     }
 
 }

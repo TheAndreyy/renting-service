@@ -6,6 +6,7 @@ import com.example.rentingservice.entities.User;
 import com.example.rentingservice.mappres.CreateReservationRequestToReservationMapper;
 import com.example.rentingservice.mappres.reservationresponse.ReservationToReservationResponseMapper;
 import com.example.rentingservice.models.CreateReservationRequest;
+import com.example.rentingservice.models.UpdateReservationRequest;
 import com.example.rentingservice.models.reservationresponse.ReservationResponse;
 import com.example.rentingservice.repositories.ReservationObjectRepository;
 import com.example.rentingservice.repositories.ReservationRepository;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +56,32 @@ public class ReservationObjectService {
         reservation.setObject(object);
         reservation = reservationRepository.save(reservation);
         return reservationResponseMapper.map(reservation);
+    }
+
+    @Transactional
+    public ReservationResponse updateReservation(Integer reservationObjectId, Integer reservationId, UpdateReservationRequest reservationRequest) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new EntityNotFoundException(String.format("Reservation with id: %d not found", reservationId)));
+
+        Instant from = Optional.ofNullable(reservationRequest.getStart()).orElse(reservation.getStart());
+        Instant to = Optional.ofNullable(reservationRequest.getEnd()).orElse(reservation.getEnd());
+
+        objectRepository.findByIdWithLock(reservationObjectId).orElseThrow(() -> new EntityNotFoundException(String.format("Object with id: %d not found", reservationObjectId)));
+
+        List<Reservation> collidingReservations = reservationRepository.findAllCollidingReservations(reservationObjectId, reservationRequest.getStart(), reservationRequest.getEnd());
+        if (isObjectReservedByOtherReservations(reservationId, collidingReservations)) {
+            throw new IllegalStateException("Object already reserved at this time.");
+        }
+
+        reservation.setStart(from);
+        reservation.setEnd(to);
+        Optional.ofNullable(reservationRequest.getCost()).ifPresent(reservation::setCost);
+        return reservationResponseMapper.map(reservation);
+    }
+
+    private static boolean isObjectReservedByOtherReservations(Integer reservationId, List<Reservation> collidingReservations) {
+        return collidingReservations.size() > 1 || (
+                collidingReservations.size() == 1 && !collidingReservations.get(0).getReservationId().equals(reservationId)
+        );
     }
 
 }
