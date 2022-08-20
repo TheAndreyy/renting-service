@@ -9,15 +9,20 @@ import com.example.rentingservice.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.ResourceUtils
 
+import java.nio.file.Files
 import java.time.Instant
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @Transactional
 class ReservationObjectControllerSpecIT extends WebMvcSpecIT {
+
+    private static String CREATE_RESERVATION_REQUEST_FILE = "classpath:controllers/create_reservation_request.json"
 
     @Autowired
     UserRepository userRepository
@@ -27,6 +32,10 @@ class ReservationObjectControllerSpecIT extends WebMvcSpecIT {
 
     @Autowired
     ReservationObjectRepository objectRepository
+
+    void cleanup() {
+        reservationRepository.deleteAll()
+    }
 
     def "It should properly return reservation list for user"() {
         given:
@@ -64,6 +73,7 @@ class ReservationObjectControllerSpecIT extends WebMvcSpecIT {
     def "It should properly return not found for object that does not exist"() {
         given:
         def objectId = 100
+
         when:
         def result = mvc.perform(get(ApplicationConstants.API_PREFIX + "/object/$objectId/reservations")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -71,6 +81,52 @@ class ReservationObjectControllerSpecIT extends WebMvcSpecIT {
         then:
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("\$.message").value("Object with id: 100 not found"))
+    }
+
+    def "It should properly create reservation"() {
+        given:
+        def request = Files.readString(ResourceUtils.getFile(CREATE_RESERVATION_REQUEST_FILE).toPath())
+        def objectId = 3
+
+        when:
+        def result = mvc.perform(post(ApplicationConstants.API_PREFIX + "/object/$objectId/reserve")
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON))
+
+        then:
+        result.andExpect(status().isOk())
+        reservationRepository.findAll().size() == 1
+
+        def reservation = objectRepository.findById(objectId).get().reservations[0]
+        reservation.start == Instant.parse("2022-08-18T17:03:35.00Z")
+        reservation.end == Instant.parse("2022-08-20T17:03:35.00Z")
+        reservation.cost == BigDecimal.valueOf(2111, 2)
+        reservation.lessee.userId == 2
+    }
+
+    def "It should not create reservation for already reserved object"() {
+        given:
+        def request = Files.readString(ResourceUtils.getFile(CREATE_RESERVATION_REQUEST_FILE).toPath())
+        def objectId = 3
+
+        and:
+        reservationRepository.save(new Reservation(
+                start: Instant.parse("2022-08-16T17:03:35.00Z"),
+                end: Instant.parse("2022-08-19T17:03:35.00Z"),
+                cost: BigDecimal.valueOf(3377, 2),
+                lessee: userRepository.findById(2).get(),
+                object: objectRepository.findById(3).get()
+        ))
+
+        when:
+        def result = mvc.perform(post(ApplicationConstants.API_PREFIX + "/object/$objectId/reserve")
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON))
+
+        then:
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("\$.message").value("Object already reserved at this time."))
+        reservationRepository.findAll().size() == 1
     }
 
 }
