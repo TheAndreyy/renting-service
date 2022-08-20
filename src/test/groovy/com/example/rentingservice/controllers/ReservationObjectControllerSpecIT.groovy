@@ -14,8 +14,7 @@ import org.springframework.util.ResourceUtils
 import java.nio.file.Files
 import java.time.Instant
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -23,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ReservationObjectControllerSpecIT extends WebMvcSpecIT {
 
     private static String CREATE_RESERVATION_REQUEST_FILE = "classpath:controllers/create_reservation_request.json"
+    private static String UPDATE_RESERVATION_REQUEST_FILE = "classpath:controllers/update_reservation_request.json"
 
     @Autowired
     UserRepository userRepository
@@ -115,7 +115,7 @@ class ReservationObjectControllerSpecIT extends WebMvcSpecIT {
                 end: Instant.parse("2022-08-19T17:03:35.00Z"),
                 cost: BigDecimal.valueOf(3377, 2),
                 lessee: userRepository.findById(2).get(),
-                object: objectRepository.findById(3).get()
+                object: objectRepository.findById(objectId).get()
         ))
 
         when:
@@ -127,6 +127,70 @@ class ReservationObjectControllerSpecIT extends WebMvcSpecIT {
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("\$.message").value("Object already reserved at this time."))
         reservationRepository.findAll().size() == 1
+    }
+
+    def "It should properly update reservation"() {
+        given:
+        def request = Files.readString(ResourceUtils.getFile(UPDATE_RESERVATION_REQUEST_FILE).toPath())
+        def objectId = 3
+        def reservationId = reservationRepository.save(new Reservation(
+                start: Instant.parse("2022-08-01T17:03:35.00Z"),
+                end: Instant.parse("2022-08-03T17:03:35.00Z"),
+                cost: BigDecimal.valueOf(3377, 2),
+                lessee: userRepository.findById(2).get(),
+                object: objectRepository.findById(objectId).get()
+        )).reservationId
+
+        when:
+        def result = mvc.perform(patch(ApplicationConstants.API_PREFIX + "/object/$objectId/reservation/$reservationId")
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON))
+        then:
+        result.andExpect(status().isOk())
+
+        def reservation = reservationRepository.findById(reservationId).get()
+        reservation.start == Instant.parse("2022-08-18T17:03:35.00Z")
+        reservation.end == Instant.parse("2022-08-20T17:03:35.00Z")
+        reservation.cost == BigDecimal.valueOf(2111, 2)
+    }
+
+    def "It should return bad request given extending reservation is not possible"() {
+        given:
+        def objectId = 3
+
+        def start = Instant.parse("2022-08-01T17:03:35.00Z")
+        def end = Instant.parse("2022-08-03T17:03:35.00Z")
+        def cost = BigDecimal.valueOf(3377, 2)
+        def reservationId = reservationRepository.save(new Reservation(
+                start: start,
+                end: end,
+                cost: cost,
+                lessee: userRepository.findById(2).get(),
+                object: objectRepository.findById(objectId).get()
+        )).reservationId
+
+        and:
+        reservationRepository.save(new Reservation(
+                start: end,
+                end: Instant.parse("2022-08-05T17:03:35.00Z"),
+                cost: BigDecimal.valueOf(1156, 2),
+                lessee: userRepository.findById(2).get(),
+                object: objectRepository.findById(objectId).get()
+        ))
+
+        when:
+        def result = mvc.perform(patch(ApplicationConstants.API_PREFIX + "/object/$objectId/reservation/$reservationId")
+                .content("{\"end\": \"2022-08-05T17:03:35.00Z\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+
+        then:
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("\$.message").value("Object already reserved at this time."))
+
+        def reservation = reservationRepository.findById(reservationId).get()
+        reservation.start == start
+        reservation.end == end
+        reservation.cost == cost
     }
 
 }

@@ -74,7 +74,7 @@ public class ReservationObjectService {
 
             objectRepository.findByIdWithLock(reservationObjectId)
                     .orElseThrow(() -> new EntityNotFoundException(String.format("Object with id: %d not found", reservationObjectId)));
-            List<Reservation> collidingReservations = reservationRepository.findAllCollidingReservations(reservationObjectId, reservationRequest.getStart(), reservationRequest.getEnd());
+            List<Reservation> collidingReservations = reservationRepository.findAllCollidingReservations(reservationObjectId, start, end);
             if (isObjectReservedByOtherReservations(reservationId, collidingReservations)) {
                 throw new ObjectAlreadyReservedException("Object already reserved at this time.");
             }
