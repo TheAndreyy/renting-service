@@ -30,8 +30,8 @@ class ReservationObjectServiceSpec extends Specification {
         def reservationObjectId = 1
         def reservation1 = new Reservation(reservationId: 1)
         def reservation2 = new Reservation(reservationId: 2)
-        def response1 = new ReservationResponse(null, null, Instant.parse("2007-12-03T10:15:30.00Z"), null, null)
-        def response2 = new ReservationResponse(null, null, Instant.parse("1999-12-03T10:15:30.00Z"), null, null)
+        def response1 = new ReservationResponse(null, Instant.parse("2007-12-03T10:15:30.00Z"), null, null, null, null)
+        def response2 = new ReservationResponse(null, Instant.parse("1999-12-03T10:15:30.00Z"), null, null, null, null)
 
         when:
         def result = service.getReservations(reservationObjectId)
