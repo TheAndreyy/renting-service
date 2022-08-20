@@ -12,8 +12,11 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(indexes = {
+        @Index(columnList = "start"),
+        @Index(columnList = "end")
+})
 public class Reservation {
-    // TODO: Add index
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
