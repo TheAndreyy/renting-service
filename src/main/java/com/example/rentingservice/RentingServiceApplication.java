@@ -48,7 +48,7 @@ public class RentingServiceApplication {
                     .reservationObjectId(1)
                     .shortDescription("Barak")
                     .longDescription("Bardzo fajny barak")
-                    .unitPrice(BigDecimal.valueOf(3000, 100))
+                    .unitPrice(BigDecimal.valueOf(3000, 2))
                     .unit(TimeUnit.DAYS)
                     .owner(user1)
                     .build());
@@ -57,7 +57,7 @@ public class RentingServiceApplication {
                     .reservationObjectId(2)
                     .shortDescription("Szopa")
                     .longDescription("Bardzo fajna szopa")
-                    .unitPrice(BigDecimal.valueOf(10000, 100))
+                    .unitPrice(BigDecimal.valueOf(10000, 2))
                     .unit(TimeUnit.DAYS)
                     .owner(user1)
                     .build());
@@ -66,7 +66,7 @@ public class RentingServiceApplication {
                     .reservationObjectId(3)
                     .shortDescription("Pałac")
                     .longDescription("Bardzo fajny pałac")
-                    .unitPrice(BigDecimal.valueOf(99999999, 100))
+                    .unitPrice(BigDecimal.valueOf(99999999, 2))
                     .unit(TimeUnit.DAYS)
                     .owner(user2)
                     .build());
